@@ -1,7 +1,12 @@
 package logentries
 
+import (
+	"io/ioutil"
+	"os"
+)
+
 // Certs from https://logentries.com/doc/certificates
-var pemCerts = []byte(`
+var defaultCerts = []byte(`
 -----BEGIN CERTIFICATE-----
 MIIE/DCCA+SgAwIBAgIDAtQDMA0GCSqGSIb3DQEBBQUAMEAxCzAJBgNVBAYTAlVT
 MRcwFQYDVQQKEw5HZW9UcnVzdCwgSW5jLjEYMBYGA1UEAxMPR2VvVHJ1c3QgU1NM
@@ -220,3 +225,15 @@ Nr4TDea9Y355e6cJDUCrat2PisP29owaQgVR1EX1n6diIWgVIEM8med8vSTYqZEX
 c4g/VhsxOBi0cQ+azcgOno4uG+GMmIPLHzHxREzGBHNJdmAPx/i9F4BrLunMTA5a
 mnkPIAou1Z5jJh5VkpTYghdae9C8x49OhgQ=
 -----END CERTIFICATE-----`)
+
+var pemCerts = GetCerts("/etc/ssl/certs/ca-certificates.crt")
+
+func GetCerts(location string) []byte {
+	if _, err := os.Stat(location); err == nil {
+		certs, err := ioutil.ReadFile(location)
+		if err == nil {
+			return certs
+		}
+	}
+	return defaultCerts
+}
